@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="icon" href="img/sdz.ico" type="images/x-ico" />
+		<title>登录</title>
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<style type="text/css">
+			.el-header,
+			.el-footer {
+				padding-top: 15px;
+				width: 100%;
+				height: auto;
+				/*background: white;*/
+				font-size: 30px;
+				text-align: center;
+			}
+			.el-main {
+				margin: 0px auto;
+				width: 30%;
+				height: auto;
+				text-align: center;
+			}
+			.el-collapse,
+			.el-collapse-item {
+				border: 0;
+			}
+		</style>
+	</head>
+		<body style="background:#f6f6f6;">
+
+		<div id="loginApp" style="margin: 0% auto;">
+			<el-container>
+				<el-header style=''>
+					
+				</el-header>
+				<el-main >
+					<h1 style="background: white;margin: 0;"><img src="img/dzwlogo.gif" width="150px" height="48px"/><strong>德召文汽修系统</strong></h1>
+					
+					<el-collapse v-model="activeNames" accordion>
+						<el-collapse-item name="1">
+							<template slot="title">
+								<h1><i class="el-icon-s-custom"></i>&nbsp;登陆</h1>
+							</template>
+							<div id="login" style="padding: 15px;">
+								<el-form :model="login" ref="login" label-width="100px" status-icon class="demo-ruleForm">
+									<el-form-item label="账号" prop="username" :rules="[{ required: true, message: '账号不能为空'}]">
+										<el-input type="username" v-model="login.username" autocomplete="off" placeholder="请输入账号"></el-input>
+									</el-form-item>
+									<el-form-item label="密码" prop="pwd" :rules="[{ required: true, message: '密码不能为空'}]">
+										<el-input type="password" v-model="login.pwd" autocomplete="off" placeholder="请输入密码"></el-input>
+									</el-form-item>
+									<el-form-item>
+										<el-button type="success" @click="submitForm('login')">提交账号</el-button>
+										<el-button type="primary" @click="resetForm('login')">重置</el-button>
+									</el-form-item>
+								</el-form>
+							</div>
+						</el-collapse-item>
+						
+					</el-collapse>
+				</el-main>
+				<el-footer></el-footer>
+			</el-container>
+
+		</div>
+	</body>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<script>
+		var app = new Vue({
+			el:'#loginApp',
+			data:{
+				activeNames: ['1'],
+					login: {
+						username: '',
+						pwd: ''
+					},
+					register: {
+						userName: '',
+						userPassword: '',
+						userCardNo: '',
+						userTel: '',
+						userAddress: '',
+						userPostNumber: '',
+					}
+			},
+			
+		});
+		
+		
+	</script>
+</html>
