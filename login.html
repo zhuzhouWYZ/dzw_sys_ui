@@ -1,93 +1,161 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
-		<meta charset="UTF-8">
-		<link rel="icon" href="img/sdz.ico" type="images/x-ico" />
-		<title>登录</title>
-		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<script type="text/javascript" src="js/vue.js"></script>
+		<script type="text/javascript" src="js/jquery-1.12.4.js"></script>
+
 		<style type="text/css">
-			.el-header,
-			.el-footer {
-				padding-top: 15px;
+			* {
+				
+			}
+			
+			#loginApp {
+				background: url(img/bg.png) no-repeat center center;
+				/*background: #000000;*/
+				background-size: cover;
+				background-attachment: fixed;
 				width: 100%;
-				height: auto;
-				/*background: white;*/
-				font-size: 30px;
-				text-align: center;
+				height: 100%;
+				max-width: 100%;
+				max-height: 100%;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				margin: auto;
+				overflow: auto;
+				position: fixed;
+				z-index: -1;
 			}
-			.el-main {
+			
+			#loginForm {
+				text-align: center;
+				background: white;
+				width: 500px;
 				margin: 0px auto;
-				width: 30%;
-				height: auto;
-				text-align: center;
-			}
-			.el-collapse,
-			.el-collapse-item {
-				border: 0;
+				margin-top: 200px;
+				padding: 30px;
+				border: 1px solid snow;
+				border-radius: 30px;
+				box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 			}
 		</style>
 	</head>
-		<body style="background:#f6f6f6;">
 
-		<div id="loginApp" style="margin: 0% auto;">
+	<body>
+		<div id="loginApp">
 			<el-container>
-				<el-header style=''>
-					
-				</el-header>
-				<el-main >
-					<h1 style="background: white;margin: 0;"><img src="img/dzwlogo.gif" width="150px" height="48px"/><strong>德召文汽修系统</strong></h1>
-					
-					<el-collapse v-model="activeNames" accordion>
-						<el-collapse-item name="1">
-							<template slot="title">
-								<h1><i class="el-icon-s-custom"></i>&nbsp;登陆</h1>
-							</template>
-							<div id="login" style="padding: 15px;">
-								<el-form :model="login" ref="login" label-width="100px" status-icon class="demo-ruleForm">
-									<el-form-item label="账号" prop="username" :rules="[{ required: true, message: '账号不能为空'}]">
-										<el-input type="username" v-model="login.username" autocomplete="off" placeholder="请输入账号"></el-input>
-									</el-form-item>
-									<el-form-item label="密码" prop="pwd" :rules="[{ required: true, message: '密码不能为空'}]">
-										<el-input type="password" v-model="login.pwd" autocomplete="off" placeholder="请输入密码"></el-input>
-									</el-form-item>
-									<el-form-item>
-										<el-button type="success" @click="submitForm('login')">提交账号</el-button>
-										<el-button type="primary" @click="resetForm('login')">重置</el-button>
-									</el-form-item>
-								</el-form>
-							</div>
-						</el-collapse-item>
-						
-					</el-collapse>
+				<el-main>
+					<el-form id="loginForm" :model="login" label-width="0px" style="" size="medium">
+						<el-form-item style="background: black;">
+							<el-image src="img/log.png" fit="fill"></el-image>
+						</el-form-item>
+						<el-form-item>
+							<el-input placeholder="请输入账号" v-model="login.emplogenid">
+								<template slot="prepend"><i class="el-icon-user" style="font-size: 17px;"></i></template>
+							</el-input>
+						</el-form-item>
+						<el-form-item>
+							<el-input placeholder="请输入密码" v-model="login.emplogepaw" type="password">
+								<template slot="prepend"><i class="el-icon-lock" style="font-size: 17px;"></i></template>
+							</el-input>
+						</el-form-item>
+						<el-form-item>
+							<el-button @click="dologin" type="success" style="width: 60%;font-size: 14px;float: left;">登录</el-button>
+							<el-button @click="resetLoginForm" type="primary" style="width: 30%;font-size: 14px;float: right;">重置</el-button>
+						</el-form-item>
+					</el-form>
 				</el-main>
-				<el-footer></el-footer>
 			</el-container>
-
 		</div>
 	</body>
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-	<script>
-		var app = new Vue({
-			el:'#loginApp',
-			data:{
-				activeNames: ['1'],
-					login: {
-						username: '',
-						pwd: ''
-					},
-					register: {
-						userName: '',
-						userPassword: '',
-						userCardNo: '',
-						userTel: '',
-						userAddress: '',
-						userPostNumber: '',
-					}
+	<!--<script type="text/javascript" src="js/jq_ajax_config.js"></script>-->
+	<script type="text/javascript" src="js/index.js"></script>
+	<script type="text/javascript">
+		var login = new Vue({
+			el: '#loginApp',
+			data: {
+				login: {
+					emplogenid: '',
+					emplogepaw: ''
+				}
 			},
-			
+			mounted() {
+				sessionStorage.clear();
+			},
+			methods: {
+				dologin() {
+					let _this = this;
+					if(this.login.emplogenid == '' && this.login.emplogepaw == '') {
+						this.$message.error({
+							message: '请输入账号或密码！',
+							center: true
+						});
+						return
+					}
+					$.getJSON(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/login/${this.login.emplogenid}/${this.login.emplogepaw}`, function(data) {
+											if(data.code == "200") {
+												if(data.EMP.status!=0){
+													_this.$message({
+													showClose: true,
+													message: '用户已经离职！',
+													type: 'error'
+												});
+													return
+												}
+												
+												/*保存当前登入的用户信息*/
+												sessionStorage.setItem("qk","yes");
+												sessionStorage.setItem("EMP", JSON.stringify(data.EMP));
+												const loading = _this.$loading({
+										          lock: true,
+										          text: '登录中...',
+										          spinner: 'el-icon-loading',
+										          background: 'rgba(0, 0, 0, 0.7)'
+										        });
+										        setTimeout(() => {
+										          loading.close();
+												//  _this.openSuccess('登录成功！'); 
+										        }, 3000);
+												
+												location.href='index.html'
+											} else if(data.code == "403"){
+												_this.$message({
+													showClose: true,
+													message: '用户名或者密码错误！',
+													type: 'error'
+												});
+											}
+										});
+
+				},
+				resetLoginForm(){
+					this.login.emplogenid = '';
+					this.login.emplogepaw = '';
+				},
+				openSuccess(me) {
+					this.$message({
+						message: me,
+						type: 'success'
+					});
+				},
+				 openFullScreen() {
+			        const loading = this.$loading({
+			          lock: true,
+			          text: 'Loading',
+			          spinner: 'el-icon-loading',
+			          background: 'rgba(0, 0, 0, 0.7)'
+			        });
+			        setTimeout(() => {
+			          loading.close();
+			        }, 2000);
+			    },
+			}
 		});
-		
-		
 	</script>
+
 </html>
