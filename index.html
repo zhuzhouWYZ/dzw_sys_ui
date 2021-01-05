@@ -1,159 +1,287 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="img/sdz.ico" type="images/x-ico" />
 		<link rel="stylesheet" href="css/index.css" />
+		<!--<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
 		<title>首页</title>
+		<style type="text/css">
+			[v-cloak] {
+				display: none;
+			}
+			#syApp {
+				height: 930px;
+				box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2)
+			}
+			.home-container {
+				height: 100%;
+			}
+			
+			.el-header {
+				background-color: black;
+				display: flex;
+				justify-content: space-between;
+				padding-left: 0;
+				align-items: center;
+				color: #FFFFFF;
+				font-size: 14px;
+			}
+			
+			.head-left {
+				display: flex;
+				align-items: center;
+			}
+			
+			.head-left span {
+				margin-left: 15px;
+			}
+			.el-dropdown-item{
+				margin-bottom: 20px;
+			}
+			
+			.el-aside {
+				background-color: #333744;
+			}
+			
+			.el-aside .el-menu {
+				border-right: none;
+			}
+			
+			.el-main {
+				/*background-color: #eaedf1;*/
+			}
+			
+			.toggle-button {
+				background-color: #4A5064;
+				font-size: 24px;
+				line-height: 34px;
+				color: #fff;
+				text-align: center;
+				cursor: pointer;
+			}
+		</style>
 	</head>
+
 	<body>
-		<div id="syApp"  style="box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.4)">
-			<el-container style="height: 930px;">
-				<el-header style="padding: 0px;">
-					<el-menu :default-active="activeIndex2" class="el-menu-demo" mode="horizontal" @select="handleSelect" :background-color="backgroundcolor" :text-color="textcolor" :active-text-color="activetextcolor">
-						
-						<el-menu-item>
-							<img src="img/dzwlogo.gif" width="160px" height="40px" />
-						</el-menu-item>
-
-						<el-menu-item v-for="(item,i) in caiDanList" v-if="item.caidanidfu==0" class="xuanze" index="i+1" @click="yjAlod(item.controlleraction,item.caidanid)">{{item.menuname}}</el-menu-item>
-<el-menu-item index="7" @click="zti" class="xuanze"><span class="el-icon-s-grid"></span>{{zhuti}}</el-menu-item>
-
-
-
-						<el-dropdown style="float: right; margin-right: 100px;">
-							<span class="el-dropdown-link">
-								<span class="el-icon-s-custom"></span>
-								<span style="color: darkorange;">{{EMP.empname}}</span>
-								
-							</span>
+		<div id="syApp" v-cloak>
+			<el-container class="home-container">
+				<!--头部-->
+				<el-header>
+					<div class="head-left">
+						<img src="img/log.png" height="60px" />
+						<span>欢迎您，<em style="color: #3A8EE6;font-weight: bolder;">admin</em></span>
+					</div>
+					<div class="head-right">
+						<el-dropdown split-button type="primary">
+							<i class="el-icon-user-solid"></i> admin
 							<el-dropdown-menu slot="dropdown">
-								<el-dropdown-item>个人信息</el-dropdown-item>
-								<el-dropdown-item>注销</el-dropdown-item>
+								<el-dropdown-item><i class="el-icon-user"></i> 个人信息</el-dropdown-item>
+								<el-dropdown-item><i class="el-icon-edit-outline"></i> 修改密码</el-dropdown-item>
+								<el-dropdown-item @click="loginOut"><i class="el-icon-back"></i> 退出登录</el-dropdown-item>
 
 							</el-dropdown-menu>
 						</el-dropdown>
-					</el-menu>
+						
+					</div>
+
 				</el-header>
+
 				<el-container>
-					<el-aside width="200px" class="elaside">
-						<el-row class="tac">
-							<el-col :span="24">
-								<!--:collapse="isCollapse"-->
-								<el-menu default-active="1-4-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" style="height: 870px;" :background-color="backgroundcolor" :text-color="textcolor" :active-text-color="activetextcolor">
-									<!--首页显示营业报表,今日营业情况-->
-									<el-menu-item index="0">
-										<i class="el-icon-platform-eleme"></i>
-										<span slot="title">首页</span>
-									</el-menu-item>
-								</el-menu>
-							</el-col>
-						</el-row>
+
+					<!--侧边栏-->
+					<el-aside :width="isCollapse ? '64px' : '200px'">
+						<div class="toggle-button" @click="toggleCollapse"><i :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i></div>
+						<!--侧边栏菜单区-->
+						<el-menu background-color="#333744" text-color="#fff" active-text-color="#409EFF" unique-opened :collapse="isCollapse" :collapse-transition="false">
+							<!--一级菜单-->
+							<el-submenu index="1">
+								<!--一级菜单模板区-->
+								<template slot="title">
+									<!--图标-->
+									<i class="el-icon-s-shop"></i>
+									<!--文本-->
+									<span>商品管理</span>
+								</template>
+								<el-menu-item index="1-1">
+									<template slot="title">
+										<!--图标-->
+										<i class="el-icon-menu"></i>
+										<!--文本-->
+										<span>供货单位</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="1-2">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>维修项目</span>
+									</template>
+								</el-menu-item>
+							</el-submenu>
+
+							<el-submenu index="2">
+								<template slot="title">
+									<i class="el-icon-s-custom"></i>
+									<span>客户管理</span>
+								</template>
+								<el-menu-item index="2-1">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>客户列表</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="2-2">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>客户车辆</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="2-3">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>会员列表</span>
+									</template>
+								</el-menu-item>
+							</el-submenu>
+
+							<el-submenu index="3">
+								<template slot="title">
+									<i class="el-icon-film"></i>
+									<span>系统管理</span>
+								</template>
+								<el-menu-item index="3-1">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>系统日志</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="3-2" @click="showView('view/xn/juese', '角色管理')">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>角色管理</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="3-3">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>权限管理</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="3-4">
+									<template slot="title">
+										<i class="el-icon-menu"></i>
+										<span>数据统计</span>
+									</template>
+								</el-menu-item>
+							</el-submenu>
+
+						</el-menu>
 					</el-aside>
+					<!--主体-->
 					<el-main>
 						<el-row>
-
-							<el-col :span="22">
-								<div class="grid-content bg-purple-dark nerong">
-							</div>
-							</div>
-							</el-col>
+							<el-tabs style="border: none;" v-model="editableTabsValue" @tab-click="goTabs" @tab-remove="removeTab" closable type="card">
+								<el-tab-pane :key="item.name" v-for="(item, index) in editableTabs" :label="item.title" :name="item.name">
+									{{item.content}}
+								</el-tab-pane>
+							</el-tabs>
+						</el-row>
+						<el-row>
+							<div id="cnt">Welcome!</div>
 						</el-row>
 					</el-main>
 				</el-container>
-				<!--<el-footer style="background-color: aquamarine;">Footer</el-footer>-->
+
 			</el-container>
 		</div>
 	</body>
-	<script src="js/jquery-1.12.4.js" ></script>
+	<script src="js/jquery-1.12.4.js"></script>
 	<script src="js/vue.js"></script>
 	<script src="js/index.js"></script>
 	<script src="js/jq_ajax_config.js"></script>
 	<script src="js/menu_const.js"></script>
 	<script>
 		var syApp = new Vue({
-			el:'#syApp',
+			el: "#syApp",
 			data: {
-				treeNodes: {},
-				/*菜单集合*/
-				backgroundcolor: '',
-				textcolor: '',
-				activetextcolor: '',
-				activeIndex: '1',
-				activeIndex2: '1',
-				isCollapse: true,
-				zhuti: '主题颜色(白色)',
-				EMP: {}, //用户对象
-				qxkz: {},
-				caiDanList: [],
-				/*菜单集合*/
-				caidanid: "",
-				/*当前父菜单id*/
+				isCollapse: false,
+				editableTabsValue: "",
+				editableTabs: [],
+				menuMapping: {},
 			},
 			mounted() {
-				
-				let _this = this;
-				this.user();
-				_this.zhuti = '主题颜色(黑色)';
-				_this.backgroundcolor = '#1a1e1a';
-				_this.textcolor = '#fff';
-				_this.activetextcolor = '#ffd04b';
-//				vmwx.yansehei();
-//				vmqt.yansehei();
-//				vmkf.yansehei();
-//				vmsj.yansehei();
-//				vmcz.yansehei();
+				this.showView('/', '首页');
 			},
 			methods: {
-				yjAlod(code, caidanid){
-					this.caidanid = caidanid;
-					$(".elaside").load(menuMapping[code]); //ajax加载页面
-
-				},
-				handleSelect(key, keyPath) { 
-				},
-				handleOpen(key, keyPath) {
-					console.log(key, keyPath);
-				},
-				handleClose(key, keyPath) {
-					console.log(key, keyPath);
-				},
-				//跟换主题方法
-				zti() {
-					let _this = this;
-					if(_this.zhuti == '主题颜色(白色)') {
-						_this.zhuti = '主题颜色(黑色)';
-						_this.backgroundcolor = '#1a1e1a';
-						_this.textcolor = '#fff';
-						_this.activetextcolor = '#ffd04b';
-//						vmwx.yansehei();
-//						vmqt.yansehei();
-//						vmkf.yansehei();
-//						vmsj.yansehei();
-//						vmcz.yansehei();
-					} else if(_this.zhuti == '主题颜色(黑色)') {
-						_this.zhuti = '主题颜色(白色)';
-						_this.backgroundcolor = '';
-						_this.textcolor = '';
-						_this.activetextcolor = '';
-//						vmwx.yansebai();
-//						vmqt.yansebai();
-//						vmkf.yansebai();
-//						vmsj.yansebai();
-//						vmcz.yansebai();
-					}
-				},
-				user() {
+				getLoginEMP() {
 					let _this = this;
 					_this.EMP = sessionStorage.getItem("EMP");
 					console.log(_this.EMP);
-					
+
 				},
-				
-				
+				loginOut() {
+					this.$confirm("是否退出？", "系统提示", {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning'
+					}).then(() => {
+						window.sessionStorage.clear();
+						window.location.href = "login.html";
+					}).cath(() => {});
+
+				},
+				showView(url, title) {
+					var isCode = parseInt(url);
+					if(!isNaN(isCode)) {
+						url = this.menuMapping[url];
+					}
+
+					let _this = this;
+					let tab = {
+						title: title,
+						name: url
+					};
+					let items = this.editableTabs.filter(function(temp) {
+						return temp.name == url; //过滤条件
+					});
+					if(items.length <= 0) {
+						_this.editableTabs.push(tab);
+					}
+					_this.editableTabsValue = url;
+					$('#cnt').load(url + ".html");
+				},
+				//折叠展开侧边菜单
+				toggleCollapse() {
+					this.isCollapse = !this.isCollapse;
+				},
+				removeTab(targetName) {
+					let tabs = this.editableTabs;
+					let activeName = this.editableTabsValue;
+					if(activeName === targetName) {
+						tabs.forEach((tab, index) => {
+							if(tab.name === targetName) {
+								let nextTab = tabs[index + 1] || tabs[index - 1];
+								if(nextTab) {
+									activeName = nextTab.name;
+									this.showView(nextTab.name, nextTab.title);
+								}
+							}
+						});
+					}
+					this.editableTabsValue = activeName;
+					this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+					if(this.editableTabs.length == 0) {
+						this.showView('/', '首页');
+					}
+				},
+				goTabs() {
+					$('#cnt').load(this.editableTabsValue + ".html");
+				},
+
 			},
-			
-			
+
 		})
 	</script>
+
 </html>
