@@ -59,7 +59,7 @@
 							</el-input>
 						</el-form-item>
 						<el-form-item>
-							<el-input placeholder="请输入密码" v-model="login.emplogepaw" type="password">
+							<el-input placeholder="请输入密码" v-model="login.emplogepaw" type="password" show-password>
 								<template slot="prepend"><i class="el-icon-lock" style="font-size: 17px;"></i></template>
 							</el-input>
 						</el-form-item>
@@ -108,7 +108,8 @@
 							}
 
 							/*保存当前登入的用户信息*/
-							sessionStorage.setItem("qk", "yes");
+//							sessionStorage.setItem("qk", "yes");
+							window.sessionStorage.setItem("users",JSON.stringify(rs.user));
 							sessionStorage.setItem("EMP", JSON.stringify(data.EMP));
 							const loading = _this.$loading({
 								lock: true,

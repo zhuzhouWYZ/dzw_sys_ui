@@ -5,7 +5,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>人事-岗位定义</title>
-		<link rel="stylesheet" href="../../css/index.css" />
+		<!--<link rel="stylesheet" href="../../css/index.css" />-->
 	</head>
 
 	<body>
@@ -49,15 +49,14 @@
 			</el-container>
 		</div>
 	</body>
-	<script src="../../js/vue.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/index.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios_cfg.js" type="text/javascript" charset="utf-8"></script>
+	<!--<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/index.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/axios_cfg.js" type="text/javascript" charset="utf-8"></script>-->
 	<script>
 		var id1 = 0;
 		var ppp = new Vue({
-			data() {
-				return {
+			data:{
 					person: {
 						postid:'',
 						departmentid:'',
@@ -66,7 +65,7 @@
 					tableData1: {},
 					currentRow: null
 
-				}
+				
 			},
 			methods: {
 				toPerson(p, s) {
@@ -86,7 +85,8 @@
 								message: '新增成功',
 								type: 'success'
 							})
-							_this.toPerson(1, 3);
+							
+							syApp.showView('view/cjl/岗位定义', '岗位定义');
 						}else if(resp.data.code == "500"){
 							_this.$message({
 								message: '职位重复',
@@ -94,7 +94,7 @@
 							})
 							
 						}
-						window.location.reload();
+						this.toPerson(1, 3);
 					}).catch(function(e) {});
 				
 				},
@@ -113,7 +113,7 @@
 							})
 						
 						}
-						window.location.reload();
+						syApp.showView('view/cjl/岗位定义', '岗位定义');
 					}).catch(function(e) {});
 				},
 				deletecs(postid) {
@@ -126,7 +126,7 @@
 										type: 'success'
 									})
 								}
-								window.location.reload();
+								syApp.showView('view/cjl/岗位定义', '岗位定义');
 							}).catch(function(e) {});
 						}else{
 							_this.$message({
