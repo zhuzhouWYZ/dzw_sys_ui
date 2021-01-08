@@ -1,9 +1,267 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
 		<meta charset="UTF-8">
-		<title></title>
+		<title>角色管理</title>
+
+		<style>
+			.el-tag {
+				margin: 7px;
+			}
+		</style>
 	</head>
+
 	<body>
+		<div id="jsApp">
+			<el-card>
+				<div slot="header" class="clearfix">
+					<span>角色管理</span>
+					<el-button @click="showAddDialog" style="float: right; padding: 10px 3px" type="primary">添加角色</el-button>
+				</div>
+				<el-table :data="jurisdictions" border stripe style="width: 100%;margin: 0 auto;">
+					<el-table-column type="expand">
+						<el-row v-for="temp in 1">
+							<el-col :span="4">
+								<el-tag closable>数据管理</el-tag><i class="el-icon-caret-right"></i>
+							</el-col>
+							<el-col :span="20">
+								<el-tag closable>供货单位</el-tag>
+								<el-tag closable>商品资料</el-tag>
+								<el-tag closable>维修项目</el-tag>
+								<el-tag closable>车型档案</el-tag>
+								<el-tag closable>发动机品牌</el-tag>
+							</el-col>
+						</el-row>
+
+					</el-table-column>
+					<el-table-column type="index" label="序号" width="100">
+						<!--<template slot-scope="temp">{{temp.$index+1}}</template>-->
+					</el-table-column>
+					<el-table-column prop="jurisdictionname" label="角色名" width="260"></el-table-column>
+					<el-table-column prop="jurisdictioncode" label="角色描述" width="260"></el-table-column>
+					<el-table-column prop="createby" label="创建者" width="260"></el-table-column>
+					<el-table-column prop="createdate" label="创建时间" width="260"></el-table-column>
+
+					<el-table-column label="操作">
+						<template slot-scope="temp">
+							<el-button @click="showEditDialog(temp.row)" type="primary" size="mini" icon="el-icon-edit">编辑</el-button>
+							<el-button @click="delJur(temp.$index,temp.row.jurisdictionid)" type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+							<el-button type="warning" size="mini" icon="el-icon-setting">分配权限</el-button>
+						</template>
+
+					</el-table-column>
+				</el-table>
+
+			</el-card>
+
+			<el-dialog title="添加角色" :visible.sync="addDialogVisible" width="30%" 
+				center :before-close="addDialogClose" >
+				<el-form :model="addform" label-width="120px" :rules="rules" ref="addformref">
+					<el-form-item label="角色名：" prop="jurisdictionname">
+						<el-input v-model="addform.jurisdictionname" clearable></el-input>
+					</el-form-item>
+					<el-form-item label="角色描述：" prop="jurisdictioncode">
+						<el-input v-model="addform.jurisdictioncode" clearable></el-input>
+					</el-form-item>
+					<el-form-item label="创建者：">
+						<el-input v-model="addform.createby" :disabled="true"></el-input>
+					</el-form-item>
+				</el-form>
+
+				<span slot="footer" class="dialog-footer">
+					<el-button @click="addDialogClose">取 消</el-button>  
+					<el-button type="primary" @click="addJur">确 定</el-button>
+					
+				</span>
+			</el-dialog>
+			
+			<el-dialog title="修改角色" :visible.sync="editDialogVisible" width="30%" center >
+				<el-form :model="editform" label-width="120px" :rules="rules">
+					<el-form-item label="角色名：" prop="jurisdictionname">
+						<el-input v-model="editform.jurisdictionname" clearable></el-input>
+					</el-form-item>
+					<el-form-item label="角色描述：" prop="jurisdictioncode">
+						<el-input v-model="editform.jurisdictioncode" clearable></el-input>
+					</el-form-item>
+					<el-form-item label="创建者：">
+						<el-input v-model="editform.createby" :disabled="true"></el-input>
+					</el-form-item>
+				</el-form>
+
+				<span slot="footer" class="dialog-footer">
+					<el-button @click="editDialogVisible = false">取 消</el-button>  
+					<el-button type="primary" @click="editJur">确 定</el-button>
+				</span>
+			</el-dialog>
+		</div>
 	</body>
+
+	<script>
+		var jsApp = new Vue({
+			el: '#jsApp',
+			data: {
+				EMP:{},
+				addDialogVisible: false,
+				editDialogVisible: false,
+				jurisdictions: [{
+					jurisdictionid: '1',
+					jurisdictionname: '超级管理员',
+					jurisdictioncode: 'GLY001',
+					createdate: '2020-12-29 15:47:45',
+					createby: 'admin'
+				}],
+				rules: {
+					jurisdictionname: [{
+						required: true,
+						message: '请输入角色名',
+						trigger: 'blur'
+					}],
+					jurisdictioncode: [{
+						required: true,
+						message: '请输入角色描述',
+						trigger: 'blur'
+					}]
+				},
+				addform: {
+					jurisdictionname: '',
+					jurisdictioncode: '',
+					createby: '',
+				},
+				editform:{},
+
+			},
+			created(){
+//				this.EMP = sessionStorage.getItem("EMP");
+//				console.log(this.EMP)
+			},
+			mounted() {
+				this.getJurisdictions();
+				this.EMP = JSON.parse(window.sessionStorage.getItem("EMP"));
+				console.log(this.EMP.emplogenid)
+			},
+
+			methods: {
+				getEMP(){
+					let _this = this;
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/getLoginEMP`).then(function(res) {
+						console.log(res)
+						_this.EMP = res.data;
+						console.log(_this.EMP)
+					})
+				},
+				getJurisdictions() {
+					let _this = this;
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/jurs`).then(function(res) {
+						_this.jurisdictions = res.data;
+					})
+				},
+				showAddDialog(){
+					this.addDialogVisible = true;
+					this.addform.createby = this.EMP.emplogenid;
+
+					
+				},
+				addDialogClose(done) {
+					this.addform ={
+						jurisdictionname: '',
+						jurisdictioncode: '',
+						createby: this.EMP.emplogenid
+					}
+					this.addDialogVisible = false;
+				},
+				addJur() {
+					let _this = this;
+					axios.post("http://127.0.0.1:8080/dzw_sys/api/jurs/jur/add",this.addform).then(function(res) {
+						console.log(res);
+						if(res.data.code == "200") {
+							_this.$message({
+								message: res.data.msg,
+								type: 'success'
+							})
+							_this.getJurisdictions();
+							_this.addDialogVisible=false;
+							_this.addform ={
+								jurisdictionname: '',
+								jurisdictioncode: '',
+								createby: this.EMP.emplogenid
+							}
+						}else if(resp.data.code == "500"){
+							_this.$message({
+								message: res.data.msg,
+								type: 'error'
+							})
+							
+						}
+						
+					}).catch(function(e) {});
+				},
+				showEditDialog(row){
+					this.editDialogVisible = true;
+					this.editform = row;
+					this.editform.createby = this.EMP.emplogenid;
+				},
+				editDialogClose(done){
+					this.editform ={}
+					this.editDialogVisible = false;
+				},
+				editJur(){
+					let _this = this;
+					axios.post("http://127.0.0.1:8080/dzw_sys/api/jurs/jur/modify",this.editform).then(function(res) {
+						console.log(res);
+						if(res.data.code == "200") {
+							_this.$message({
+								message: res.data.msg,
+								type: 'success'
+							})
+							_this.getJurisdictions();
+							_this.editform ={}
+							_this.editDialogVisible = false;
+						}else if(resp.data.code == "500"){
+							_this.$message({
+								message: res.data.msg,
+								type: 'error'
+							})
+
+						}
+						
+					}).catch(function(e) {});
+				},
+				delJur(index, id) {
+					this.$confirm('确定要删除改角色吗？', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+
+					}).then(() => {
+						this.jurisdictions.splice(index, 1);
+						axios.get(`http://127.0.0.1:8080/dzw_sys/api/jurs/jur/remove/${id}`).then(function(res) {
+							if(res.code == "200") {
+								this.jurisdictions.splice(index, 1);
+								_this.$message({
+									message: res.msg,
+									center: true,
+									type: 'success'
+								});
+
+							} else if(res.code == "500") {
+								_this.$message({
+									message: res.msg,
+									center: true,
+									type: 'error'
+								});
+							}
+						});
+					}).catch(() => {
+						this.$message({
+							type: 'info',
+							message: '已取消删除'
+						});
+					});
+				},
+			},
+
+		});
+	</script>
+
 </html>
