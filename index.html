@@ -82,7 +82,7 @@
 							<el-dropdown-menu slot="dropdown">
 								<el-dropdown-item><i class="el-icon-user"></i> 个人信息</el-dropdown-item>
 								<el-dropdown-item><i class="el-icon-edit-outline"></i> 修改密码</el-dropdown-item>
-								<el-dropdown-item @click="loginOut"><i class="el-icon-back"></i> 退出登录</el-dropdown-item>
+								<el-dropdown-item @click.native="loginOut"><i class="el-icon-back"></i>退出登录</el-dropdown-item>
 
 							</el-dropdown-menu>
 						</el-dropdown>
@@ -263,14 +263,15 @@
 			},
 			mounted() {
 				this.showView('welcome', '首页');
-				this.EMP = JSON.parse(window.sessionStorage.getItem("EMP"));
-//				this.getLoginEMP();
+				if(window.sessionStorage.getItem("EMP")){
+					this.EMP = JSON.parse(window.sessionStorage.getItem("EMP"));
+				}else{
+					window.location.href = "sessionerror.html";
+				}
+					
+				
 			},
 			methods: {
-				getLoginEMP() {
-					this.EMP = JSON.parse(window.sessionStorage.getItem("EMP"));
-					console.log(this.EMP);
-				},
 				loginOut() {
 					let _this = this;
 					this.$confirm("是否退出？", "系统提示", {
@@ -278,15 +279,19 @@
 						cancelButtonText: '取消',
 						type: 'warning'
 					}).then(() => {
-						
 						axios.get(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/loginOut`).then(function(res) 
 						{
+							
 							console.log(res)
+							if(res.data.code){
+								window.sessionStorage.clear();
+								window.location.href = "login.html";
+							}
+								
 							
 						});
-						window.sessionStorage.clear();
-						window.location.href = "login.html";
-					}).cath(() => {});
+
+					}).cath(()=>{});
 
 				},
 				showView(url, title) {

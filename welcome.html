@@ -2,105 +2,12 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>首页</title>
+		<title>欢迎页</title>
 	</head>
 	<body>
 		<div id="menuCountApp">
 			<h1>Welcome！！！</h1>
-					<div class="container-scroller" id="menuCountApp">
-			<!-- partial -->
-			<div class="main-panel" style="padding:5px;">
-				<div class="content-wrapper">
-					<div class="row">
-						<div class="card">
-							<div style="margin-bottom: 20px;">
-								<div class="showdiv">
-									<div>
-										<i class="mdi mdi-currency-usd mr-3 icon-lg text-danger"></i>
-										<div>
-											<small>今日收入</small>
-											<h5>{{FclShowVo.countprice}}</h5>
-										</div>
-									</div>
-									<div>
-										<i class="mdi mdi-eye mr-3 icon-lg text-success"></i>
-										<div>
-											<small>今日接车</small>
-											<h5>{{FclShowVo.jcar}}</h5>
-										</div>
-									</div>
-									<div>
-										<i class="mdi mdi-download mr-3 icon-lg text-warning"></i>
-										<div>
-											<small>今日完工</small>
-											<h5>{{FclShowVo.overNumber}}</h5>
-										</div>
-									</div>
-									<div>
-										<i class="mdi mdi-flag mr-3 icon-lg text-danger"></i>
-										<div>
-											<small>今日返工</small>
-											<h5>{{FclShowVo.returnNumber}}</h5>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!--<div class="row" style="margin-top: 20px">
-						<div class="card">
-							<div class="card-body">
-								<h4>维修统计图</h4>
-								<div id="echartsDom" style='heigth:400px;background:#fff;clear: both;padding-top: 20px'>
-								</div>
-								<div class="text-center">
-									<el-button type="primary" @click="changeView('bar')">查看柱状图</el-button>
-									<el-button type="primary" @click="changeView('pie')">查看饼图</el-button>
-									<el-button type="primary" @click="changeView('line')">查看曲线图</el-button>
-								</div>
-							</div>
-						</div>
-					</div>-->
-					<div class="row" style="margin-top: 30px;text-align: center;">
-						<div class="col-md-12 stretch-card">
-							<div class="card">
-								<div class="card-body">
-									<h3>今日接车</h3>
-									<div class="table-responsive">
-										<table id="recent-purchases-listing" class="table">
-											<thead>
-												<tr>
-													<th>编号</th>
-													<th>车牌号</th>
-													<th>技工组</th>
-													<th>入厂日期</th>
-													<th>总价格</th>
-													<th>类型</th>
-												</tr>
-											</thead>
-											<tbody>
-												<tr v-for="(temp,i) in se">
-													<td>{{temp.ser.smid}}</td>
-													<td>{{temp.name}}</td>
-													<td>{{temp.gname}}</td>
-													<td>{{temp.ser.starttime}}</td>
-													<td>{{temp.ser.countprice}}</td>
-													<td>{{temp.ser.rescueid === 0 ? '站内接车' : '站外接车'}}</td>
-												</tr>
-
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- main-panel ends -->
-		</div>
-		<!-- page-body-wrapper ends -->
-		</div>
+					
 		</div>
 	</body>
 </html>
