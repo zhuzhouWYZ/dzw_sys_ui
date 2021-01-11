@@ -72,7 +72,7 @@
 			</el-container>
 		</div>
 	</body>
-	<!--<script type="text/javascript" src="js/jq_ajax_config.js"></script>-->
+	
 	<script type="text/javascript" src="js/index.js"></script>
 	<script type="text/javascript">
 		var login = new Vue({
@@ -84,7 +84,7 @@
 				}
 			},
 			mounted() {
-				sessionStorage.clear();
+				windows.sessionStorage.clear();
 			},
 			methods: {
 				dologin() {
@@ -109,7 +109,6 @@
 
 							/*保存当前登入的用户信息*/
 //							sessionStorage.setItem("qk", "yes");
-							window.sessionStorage.setItem("users",JSON.stringify(rs.user));
 							sessionStorage.setItem("EMP", JSON.stringify(data.EMP));
 							const loading = _this.$loading({
 								lock: true,
