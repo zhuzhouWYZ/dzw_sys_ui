@@ -114,9 +114,7 @@
 							/*保存当前登入的用户信息*/
 							sessionStorage.setItem("EMP", JSON.stringify(res.data.EMP));
 							_this.openFullScreen();
-
 							location.href = 'index.html'
-							
 						}else if(res.data.code == "300"){
 							_this.$message({
 								showClose: true,
