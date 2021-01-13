@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>技工班组</title>
+		
+	</head>
+	<style>
+	  .el-row {
+	    margin-bottom: 20px;
+	    &:last-child {
+	      margin-bottom: 0;
+	    }
+	  }
+	  .el-col {
+	    border-radius: 4px;
+	  }
+	  .bg-purple-dark {
+	    background: #99a9bf;
+	  }
+	  .bg-purple {
+	    background: #d3dce6;
+	  }
+	  .bg-purple-light {
+	    background: #e5e9f2;
+	  }
+	  .grid-content {
+	    border-radius: 4px;
+	    min-height: 36px;
+	  }
+	  .row-bg {
+	    padding: 10px 0;
+	    background-color: #f9fafc;
+	  }
+	</style>
+	<body>
+		<div id="meteam">
+			<el-card>
+			<form class="form-inline">
+			  <div class="form-group">
+			    <!--<label class="sr-only">Email</label>-->
+			    <!--<p class="form-control-static">email@example.com</p>-->
+			  </div>
+			  <div class="form-group">
+			    <label for="inputPassword2" class="sr-only">请输入关键字</label>
+			    <input type="text" class="form-control" id="inputPassword2" placeholder="请输入关键字" v-model="tname">
+			  </div>
+			  <button type="button" class="btn btn-default" @click="goToPage(1, 5,tname)">搜索</button>
+			  
+			   <button type="button" class="btn btn-default" @click="add()">新增班组</button>
+			</form>
+			<div id="app">
+					  <el-table
+		      :data="PageInfo.list"
+		      style="width: 100%" >
+		      <el-table-column
+		        prop="tid"
+		        label="班组编号"
+		        width="300px" >
+		        	
+		      </el-table-column>
+		      <el-table-column
+		        prop="tname"
+		        label="班组名称"
+		        width="300px">
+		        	
+		      </el-table-column>
+		     <el-table-column
+		        prop="tprice"
+		        label="班组价格"
+		        width="300px">
+		        	
+		      </el-table-column>
+		      <el-table-column label="操作" width="350px" style="text-align: center;">
+		      	<template slot-scope="temp">
+		      	 <el-button icon="el-icon-search" circle @click="semechaic(1,10,null,temp.row.tid)"></el-button>
+		      	  <el-button type="primary" icon="el-icon-edit" circle @click="updatesome(temp.row)"></el-button>
+		      	<el-button @click="delmecha(temp.row.tid)" type="danger" icon="el-icon-delete" circle ></el-button>
+		      	</template>
+		      </el-table-column>
+		    </el-table>
+		     <div class="block">
+		    <el-pagination
+		      @size-change="handleSizeChange"
+		      @current-change="handleCurrentChange"
+		      :current-page="fenye.page"
+		      :page-sizes="[3, 10, 15, 20]"
+		      :page-size="fenye.size"
+		      layout="total, sizes, prev, pager, next, jumper"
+		      :total="total">
+		    </el-pagination>
+  		</div>
+			</div>
+			<!--
+            	作者：offline
+            	时间：2021-01-07
+            	描述：修改
+            -->
+			<div id="updatesome">
+				
+				<el-dialog title="修改班组信息" :visible.sync="dialogFormVisible">
+				  <el-form :model="form" ref="form" :rules="rules">
+				    <el-form-item label="班组名称" prop="tname" >
+				      <el-input v-model="form.tname" autocomplete="off"></el-input>
+				    </el-form-item>
+				    <el-form-item label="班组费用" prop="tprice" >
+				      <el-input v-model="form.tprice" autocomplete="off"></el-input>
+				    </el-form-item>
+				    
+				  </el-form>
+				  <div slot="footer" class="dialog-footer">
+				    <el-button @click="dialogFormVisible = false">取 消</el-button>
+				    <el-button type="button" @click="updateqd('form')" >确 定</el-button>
+				  </div>
+				</el-dialog>
+			</div>
+			<!--
+            	作者：offline
+            	时间：2021-01-08
+            	描述：新增班组
+            -->
+			<div id="addsome">
+				
+				<el-dialog title="新增班组信息" :visible.sync="dialogFormVisible1">
+				  <el-form :model="form1" ref="form1" :rules="rules">
+				    <el-form-item label="班组名称" prop="tname" >
+				      <el-input v-model="form1.tname" autocomplete="off"></el-input>
+				    </el-form-item>
+				    <el-form-item label="班组费用" prop="tprice" >
+				      <el-input v-model="form1.tprice" autocomplete="off"></el-input>
+				    </el-form-item>
+				    
+				  </el-form>
+				  <div slot="footer" class="dialog-footer">
+				    <el-button @click="dialogFormVisible1 = false">取 消</el-button>
+				    <el-button type="button" @click="addsome('form1')" >确 定</el-button>
+				  </div>
+				</el-dialog>
+			</div>
+			
+			<!--
+            	作者：offline
+            	时间：2021-01-08
+            	描述：技工板块
+            -->
+            <div id="mechanic">
+            	
+            	<el-dialog title="技工信息" :visible.sync="dialogTableVisible2">
+            		<form class="form-inline">
+			  			<!--<div class="form-group">-->
+	            	<div class="form-group">
+					    <label for="inputPassword2" class="sr-only">请输入关键字</label>
+					    <input type="text" class="form-control" id="inputPassword2" placeholder="请输入关键字" v-model="msname">
+				  	</div>
+            	<button type="button" class="btn btn-default" @click="semechaic(1,100,msname,0)">搜索</button>
+			  
+			   <button type="button" class="btn btn-default" @click="addic()">新增技工</button>
+			   </form>
+				  <el-table :data="mechaic.list">
+				    <el-table-column property="mid" label="技工编号" width="100"></el-table-column>
+				    <el-table-column property="mcstatusid" label="技工状态" width="100"></el-table-column>
+				    <el-table-column property="tid" label="技工班组" width="100"></el-table-column>
+				    <el-table-column property="sid" label="技工星级" width="100"></el-table-column>
+				    <el-table-column property="mname" label="技工姓名" width="100"></el-table-column>
+				    <el-table-column property="mprice" label="技工费用"width="100"></el-table-column>
+				     <el-table-column property="mtime" label="入职时间" width="100"></el-table-column>
+				   <el-table-column label="操作" width="150px" style="text-align: center;">
+			      	<template slot-scope="temp">
+			      	 
+			      	  <el-button type="primary" icon="el-icon-edit" circle @click="updateic(temp.row)"></el-button>
+			      	<el-button type="danger" icon="el-icon-delete" circle @click="delmeic(temp.row.mid)"></el-button>
+			      	</template>
+			      </el-table-column>
+				  </el-table>
+				  <!--
+                  	作者：offline
+                  	时间：2021-01-08
+                  	描述：修改技工信息
+                  -->
+				   <el-dialog
+				      width="80%"
+				      title="修改技工信息"
+				      :visible.sync="innerVisible"
+				      append-to-body>
+				      <el-form :model="inner" ref="form">
+					    <el-form-item label="技工状态" >
+					      <el-select v-model="inner.mcstatusid" placeholder="请选择技工状态">
+					        <el-option  v-for="item in meicsta" :key="item.mcstatusid" :label="item.mcstatusname" :value="item.mcstatusid"></el-option>
+					      </el-select>
+				    	</el-form-item>
+					   <el-form-item label="技工班组" >
+					      <el-select v-model="inner.tid" placeholder="请选择技工班组">
+					        <el-option  v-for="item in PageInfo.list" :key="item.tid" :label="item.tname" :value="item.tid"></el-option>
+					      </el-select>
+				    	</el-form-item>
+					    <el-form-item label="技工星级" >
+					      <el-select v-model="inner.sid" placeholder="请选择技工班组">
+					        <el-option  v-for="item in PageInfo1.list" :key="item.sid" :label="item.sname" :value="item.sid"></el-option>
+					      </el-select>
+				    	</el-form-item>
+					    <el-form-item label="技工姓名"  >
+					      <el-input v-model="inner.mname" autocomplete="off"></el-input>
+					    </el-form-item>
+					    <el-form-item label="技工费用"  >
+					      <el-input v-model="inner.mprice" autocomplete="off"></el-input>
+					    </el-form-item>
+					    <el-form-item label="入职时间" >
+					      <el-input v-model="inner.mtime" autocomplete="off"></el-input>
+					    </el-form-item>
+					  </el-form>
+					  <div slot="footer" class="dialog-footer">
+					    <el-button @click="innerVisible = false">取 消</el-button>
+					    <el-button type="button" @click="updateicinfo()" >确 定</el-button>
+					  </div>
+				    </el-dialog>
+				</el-dialog>
+				<!--
+                	作者：offline
+                	时间：2021-01-08
+                	描述：新增技工信息
+                -->
+				<el-dialog
+				      width="80%"
+				      title="新增技工信息"
+				      :visible.sync="innerVisible1"
+				      append-to-body>
+				      <el-form :model="inner1" ref="form">
+					    
+					    <el-form-item label="技工状态" >
+					      <el-select v-model="inner1.mcstatusid" placeholder="请选择技工状态">
+					        <el-option  v-for="item in meicsta" :key="item.mcstatusid" :label="item.mcstatusname" :value="item.mcstatusid"></el-option>
+					      </el-select>
+				    	</el-form-item>
+					   <el-form-item label="技工班组" >
+					      <el-select v-model="inner1.tid" placeholder="请选择技工班组">
+					        <el-option  v-for="item in PageInfo.list" :key="item.tid" :label="item.tname" :value="item.tid"></el-option>
+					      </el-select>
+				    	</el-form-item>
+					    <el-form-item label="技工星级" >
+					      <el-select v-model="inner1.sid" placeholder="请选择技工班组">
+					        <el-option  v-for="item in PageInfo1.list" :key="item.sid" :label="item.sname" :value="item.sid"></el-option>
+					      </el-select>
+				    	</el-form-item>
+					    <el-form-item label="技工姓名"  >
+					      <el-input v-model="inner1.mname" autocomplete="off"></el-input>
+					    </el-form-item>
+					    <el-form-item label="技工费用"  >
+					      <el-input v-model="inner1.mprice" autocomplete="off"></el-input>
+					    </el-form-item>
+					    <el-form-item label="入职时间" >
+					      <el-input v-model="inner1.mtime" autocomplete="off"></el-input>
+					    </el-form-item>
+					  </el-form>
+					  <div slot="footer" class="dialog-footer">
+					    <el-button @click="innerVisible = false">取 消</el-button>
+					    <el-button type="button" @click="addsomeic()" >确 定</el-button>
+					  </div>
+				    </el-dialog>
+				</el-dialog>
+            </div>
+            </el-card>
+		</div>
+	</body>
+
+	<script>
+	
+		var app=new Vue({
+			el:"#meteam",
+			data:{
+					msname:'',
+					total:0,
+					tname:'',
+					tid:0,
+					PageInfo: {},
+					mechaic:{},
+					fenye:{page:1,size:5},
+					form:{},
+					form1:{},
+					dialogFormVisible:false,
+					dialogFormVisible1:false,
+					dialogTableVisible2:false,
+					innerVisible:false,
+					PageInfo1:{},
+					inner:{},
+					innerVisible1:false,
+					inner1:{},
+					meicsta:[],
+					 rules: {
+			          tname: [
+			            { required: true, message: '请输入班组名称', trigger: 'blur' },
+			            { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+			          ],
+			          tprice: [
+			            { required: true, message: '请输入班组费用', trigger: 'blur' },
+			            { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+			          ]
+			         
+			        }
+			},mounted(){			
+				this.goToPage(1, this.fenye.size,"null");
+				this.sestar(1,10);
+				this.querymeicsta();
+			},methods: {
+				querymeicsta(){
+					let _this = this;
+					axios.get(`http://127.0.0.1:8080/dzw_sys/c/rei/querymeuicsta`).then(function(resp) {
+							
+							_this.meicsta = resp.data;
+							
+							console.log(resp.data)
+						});
+				},
+				addic(){
+					this.innerVisible1=true;
+				},
+				addsomeic(){
+					let _this = this;
+					axios.post(`http://127.0.0.1:8080/dzw_sys/c/rei/insertchaic`,this.inner1).then(function(resp) {
+							if(resp.data.code == "200"){
+								_this.innerVisible1=false
+								
+							}
+							
+							console.log(resp.data)
+						});
+				},
+				updateic(data){
+					
+					this.inner=JSON.parse(JSON.stringify(data));
+					console.log(this.inner);
+					this.innerVisible=true;
+				},
+				updateicinfo(){
+					let _this = this;
+					axios.put(`http://127.0.0.1:8080/dzw_sys/c/rei/updatechaic`,this.inner).then(function(resp) {
+							if(resp.data.code == "200"){
+								_this.innerVisible=false
+								
+							}
+							
+							
+							console.log(resp.data)
+						});
+				},
+				sestar(p, s) {
+						let _this = this;
+	//					if(Commdiyname==''){
+	//						Commdiyname="undefined";
+	//					}
+						axios.get(`http://127.0.0.1:8080/dzw_sys/c/rei/queryallmestar/${p}/${s}`).then(function(resp) {
+							console.log(resp.data)
+							_this.PageInfo1 = resp.data;
+							
+							console.log(resp.data.total)
+						});
+					
+					},
+				delmeic(mid){
+						let _this = this;
+						this.$confirm('确定离职, 是否继续?', '提示', {
+				          confirmButtonText: '确定',
+				          cancelButtonText: '取消',
+				          type: 'warning'
+				        }).then(() => {
+				        	axios.put(`http://127.0.0.1:8080/dzw_sys/c/rei/deletechaic/${mid}`).then(function(resp) {
+							
+								if(resp.data.code == "200") {
+									_this.dialogTableVisible2=false;
+									_this.$message({
+							            type: 'success',
+							            message: '离职成功!'
+							        });
+								}
+							})
+						}).catch(() => {
+				          this.$message({
+				            type: 'info',
+				            message: '已取消删除'
+				          });          
+				        });
+				        
+					},
+				semechaic(p,s,msname,tid){
+						let _this = this;
+	//					if(Commdiyname==''){
+	//						Commdiyname="undefined";
+	//					}
+						this.dialogTableVisible2=true;
+						axios.get(`http://127.0.0.1:8080/dzw_sys/c/rei/queryallchaic/${p}/${s}/${msname}/${tid}`).then(function(resp) {
+							
+							_this.mechaic = resp.data;
+							
+							console.log(resp.data)
+						});
+				},
+				add(){
+					this.dialogFormVisible1=true;
+				},
+				addsome(formName){
+					let _this = this;
+					  this.$refs[formName].validate((valid) => {
+						          if (valid) {
+									axios.post(`http://127.0.0.1:8080/dzw_sys/c/rei/insertmechan`,this.form1).then(function(resp) {
+										if(resp.data.code == "200"){
+											_this.dialogFormVisible1=false
+											_this.goToPage(1,10,"null");
+										}
+										_this.PageInfo = resp.data;
+										
+										_this.total=resp.data.total;
+										   
+										
+										console.log(resp.data)
+									});
+						          } else {
+						            console.log('error submit!!');
+						            return false;
+						          }
+						        });
+					
+				},
+				updatesome(data){
+					
+					this.form=JSON.parse(JSON.stringify(data));
+					console.log(this.form);
+					this.dialogFormVisible=true;
+				},
+				updateqd(){
+					let _this = this;
+					axios.put(`http://127.0.0.1:8080/dzw_sys/c/rei/updatemechan`,this.form).then(function(resp) {
+							if(resp.data.code == "200"){
+								_this.dialogFormVisible=false
+								_this.goToPage(1,10,"null");
+							}
+							_this.PageInfo = resp.data;
+							
+							_this.total=resp.data.total;
+							
+							console.log(resp.data)
+						});
+				},
+				 handleSizeChange(val) {
+			        console.log(`每页 ${val} 条`);
+			        this.fenye.size=val;
+			     
+			        this.goToPage(1,val,"null");
+			      },
+			      handleCurrentChange(val) {
+			        console.log(`当前页: ${val}`);
+			       this.fenye.page=val;
+			         this.goToPage(val,this.fenye.size,"null");
+			      },
+					goToPage(p, s,tname) {
+						let _this = this;
+	//					if(Commdiyname==''){
+	//						Commdiyname="undefined";
+	//					}
+						axios.get(`http://127.0.0.1:8080/dzw_sys/c/rei/queryallmechan/${p}/${s}/${tname}`).then(function(resp) {
+							
+							_this.PageInfo = resp.data;
+							
+							_this.total=resp.data.total;
+							console.log(resp.data)
+						});
+					
+					},
+					delmecha(tid){
+						let _this = this;
+						this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+				          confirmButtonText: '确定',
+				          cancelButtonText: '取消',
+				          type: 'warning'
+				        }).then(() => {
+				        	axios.delete(`http://127.0.0.1:8080/dzw_sys/c/rei/deletemechan/${tid}`).then(function(resp) {
+							
+								if(resp.data.code == "200") {
+									_this.goToPage(1,3,"null");
+									_this.$message({
+							            type: 'success',
+							            message: '删除成功!'
+							        });
+								}
+							})
+						}).catch(() => {
+				          this.$message({
+				            type: 'info',
+				            message: '已取消删除'
+				          });          
+				        });
+				        
+					}
+			}	
+		})
+	</script>
+	</script>
+</html>
