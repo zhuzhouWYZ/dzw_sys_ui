@@ -64,7 +64,7 @@
 							</el-input>
 						</el-form-item>
 						<el-form-item>
-							<el-button @click="dologin" type="success" style="width: 60%;font-size: 14px;float: left;">登录</el-button>
+							<el-button @click="doLoginIn" type="success" style="width: 60%;font-size: 14px;float: left;">登录</el-button>
 							<el-button @click="resetLoginForm" type="primary" style="width: 30%;font-size: 14px;float: right;">重置</el-button>
 						</el-form-item>
 					</el-form>
@@ -72,8 +72,10 @@
 			</el-container>
 		</div>
 	</body>
-	
+	<script type="text/javascript" src="js/vue.js"></script>
 	<script type="text/javascript" src="js/index.js"></script>
+	<script src="js/axios.min.js"></script>
+	<script src="js/axios_cfg.js"></script>
 	<script type="text/javascript">
 		var login = new Vue({
 			el: '#loginApp',
@@ -84,21 +86,24 @@
 				}
 			},
 			mounted() {
-				windows.sessionStorage.clear();
+				sessionStorage.clear();
 			},
 			methods: {
-				dologin() {
+				doLoginIn() {
 					let _this = this;
-					if(this.login.emplogenid == '' && this.login.emplogepaw == '') {
-						this.$message.error({
-							message: '请输入账号或密码！',
-							center: true
-						});
-						return
+					if(this.login.emplogenid == "") {
+						showAlertDialog('用户名不能为空');
+						return;
 					}
-					$.getJSON(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/login/${this.login.emplogenid}/${this.login.emplogepaw}`, function(data) {
-						if(data.code == "200") {
-							if(data.EMP.status != 0) {
+					if(this.login.emplogepaw == "") {
+						showAlertDialog('密码不能为空');
+						return;
+					}
+					//ajax请求
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/login/${this.login.emplogenid}/${this.login.emplogepaw}`).then(function(res) {
+						console.log(res.data);
+						if(res.data.code == "200"){
+							if(res.data.EMP.status != 0) {
 								_this.$message({
 									showClose: true,
 									message: '用户已经离职！',
@@ -106,23 +111,13 @@
 								});
 								return
 							}
-
 							/*保存当前登入的用户信息*/
-//							sessionStorage.setItem("qk", "yes");
-							sessionStorage.setItem("EMP", JSON.stringify(data.EMP));
-							const loading = _this.$loading({
-								lock: true,
-								text: '登录中...',
-								spinner: 'el-icon-loading',
-								background: 'rgba(0, 0, 0, 0.7)'
-							});
-							setTimeout(() => {
-								loading.close();
-								//_this.openSuccess('登录成功！'); 
-							}, 3000);
+							sessionStorage.setItem("EMP", JSON.stringify(res.data.EMP));
+							_this.openFullScreen();
 
 							location.href = 'index.html'
-						} else if(data.code == "403") {
+							
+						}else if(res.data.code == "300"){
 							_this.$message({
 								showClose: true,
 								message: '用户名或者密码错误！',
@@ -132,6 +127,7 @@
 					});
 
 				},
+
 				resetLoginForm() {
 					this.login.emplogenid = '';
 					this.login.emplogepaw = '';
@@ -151,7 +147,7 @@
 					});
 					setTimeout(() => {
 						loading.close();
-					}, 2000);
+					}, 5000);
 				},
 			}
 		});

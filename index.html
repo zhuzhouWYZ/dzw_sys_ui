@@ -5,7 +5,7 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="img/sdz.ico" type="images/x-ico" />
 		<link rel="stylesheet" href="css/index.css" />
-		<!--<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
 		<title>首页</title>
 		<style type="text/css" lang="less" scoped>
 			[v-cloak] {
@@ -98,11 +98,25 @@
 						<div class="toggle-button" @click="toggleCollapse"><i :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i></div>
 						<!--侧边栏菜单区-->
 						<el-menu background-color="#333744" text-color="#fff" active-text-color="#409EFF" unique-opened :collapse="isCollapse" :collapse-transition="false">
-							<!--一级菜单-->
+							
+
+							<el-submenu :index="i+''" v-for="(obj,i) in tree">
+								<template slot="title">
+									<span class="el-icon-s-grid"></span>
+									<span>{{obj.text}}</span>
+								</template>
+								<el-menu-item-group>
+									<span v-for="(obj1,j) in obj.children">
+											<el-menu-item  :index="i-j+''" @click="showView(obj1.id,obj1.text)"><i class="el-icon-caret-menu"></i>{{obj1.text}}</el-menu-item>
+										</span>
+								</el-menu-item-group>
+							</el-submenu>
+							
+<!--一级菜单-->
 							<el-submenu index="1">
 								<!--一级菜单模板区-->
 								<template slot="title">
-									<i class="el-icon-s-shop"></i><span>数据管理</span>
+									<i class="el-icon-s-grid"></i><span>数据管理</span>
 								</template>
 								<el-menu-item index="1-1">
 									<template slot="title">
@@ -151,7 +165,7 @@
 									</template>
 								</el-menu-item>
 							</el-submenu>
-							
+
 							<el-submenu index="3">
 								<template slot="title">
 									<i class="el-icon-s-custom"></i><span>员工管理</span>
@@ -161,52 +175,67 @@
 										<i class="el-icon-menu"></i><span>岗位定义</span>
 									</template>
 								</el-menu-item>
-								
+
 							</el-submenu>
 							<el-submenu index="4">
 								<template slot="title">
 									<i class="el-icon-s-custom"></i><span>技工管理</span>
 								</template>
-								<el-menu-item index="4-1" >
+								<el-menu-item index="4-1" @click="showView('view/ydh/mechanicteam', '技工班组')">
 									<template slot="title">
-										<i class="el-icon-menu"></i><span>岗位定义</span>
+										<i class="el-icon-menu"></i><span>技工班组</span>
 									</template>
 								</el-menu-item>
-								
+								<el-menu-item index="4-2" @click="showView('view/ydh/mechanstar', '技工星级')">
+									<template slot="title">
+										<i class="el-icon-menu"></i><span>技工星级</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="4-3" @click="showView('view/ydh/fieldVehicle', '外勤车辆')">
+									<template slot="title">
+										<i class="el-icon-menu"></i><span>外勤车辆</span>
+									</template>
+								</el-menu-item>
+
 							</el-submenu>
-							
+
 							<el-submenu index="5">
 								<template slot="title">
 									<i class="el-icon-s-custom"></i><span>前台管理</span>
 								</template>
-								<el-menu-item index="4-1">
+								<el-menu-item index="5-1">
 									<template slot="title">
 										<i class="el-icon-menu"></i><span>结算中心</span>
 									</template>
 								</el-menu-item>
-								
+								<el-menu-item index="5-2">
+									<template slot="title">
+										<i class="el-icon-menu"></i><span>会员管理</span>
+									</template>
+								</el-menu-item>
+
 							</el-submenu>
-							
+
 							<el-submenu index="6">
 								<template slot="title">
 									<i class="el-icon-s-custom"></i><span>维修管理</span>
 								</template>
-								<el-menu-item index="5-1">
+								<el-menu-item index="6-1">
 									<template slot="title">
 										<i class="el-icon-menu"></i><span>站内接单</span>
 									</template>
 								</el-menu-item>
-								<el-menu-item index="5-2">
+								<el-menu-item index="6-2">
 									<template slot="title">
 										<i class="el-icon-menu"></i><span>站外救援</span>
 									</template>
 								</el-menu-item>
-								<el-menu-item index="5-3">
+								<el-menu-item index="6-3">
 									<template slot="title">
 										<i class="el-icon-menu"></i><span>竣工检验</span>
 									</template>
 								</el-menu-item>
-								
+
 							</el-submenu>
 
 							<el-submenu index="7">
@@ -228,7 +257,7 @@
 										<i class="el-icon-menu"></i><span>权限管理</span>
 									</template>
 								</el-menu-item>
-								<el-menu-item index="7-4" >
+								<el-menu-item index="7-4">
 									<template slot="title">
 										<i class="el-icon-menu"></i><span>数据统计</span>
 									</template>
@@ -256,32 +285,37 @@
 		</div>
 	</body>
 	<script src="js/jquery-1.12.4.js"></script>
+	<script src="js/bootstrap.min.js" ></script>
 	<script src="js/vue.js"></script>
 	<script src="js/index.js"></script>
 	<script src="js/axios.min.js"></script>
 	<script src="js/axios_cfg.js"></script>
 	<script src="js/jq_ajax_config.js"></script>
 	<script src="js/menu_const.js"></script>
-	<script src="js/echarts.min.js" ></script>
+	<script src="js/echarts.min.js"></script>
 	<script>
 		var syApp = new Vue({
 			el: "#syApp",
 			data: {
-				EMP:{},
+				EMP: {},
 				isCollapse: false,
 				editableTabsValue: "",
 				editableTabs: [],
 				menuMapping: {},
+				tree: [],
 			},
 			mounted() {
 				this.showView('welcome', '首页');
-				if(window.sessionStorage.getItem("EMP")){
+				if(window.sessionStorage.getItem("EMP")) {
 					this.EMP = JSON.parse(window.sessionStorage.getItem("EMP"));
-				}else{
+				} else {
 					window.location.href = "sessionerror.html";
 				}
-					
-				
+				axios.get(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/getSyfunTree`).then(resp => {
+					console.log(resp);
+					this.tree = resp.data;
+				});
+
 			},
 			methods: {
 				loginOut() {
@@ -291,19 +325,17 @@
 						cancelButtonText: '取消',
 						type: 'warning'
 					}).then(() => {
-						axios.get(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/loginOut`).then(function(res) 
-						{
-							
+						axios.get(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/loginOut`).then(function(res) {
+
 							console.log(res)
-							if(res.data.code){
+							if(res.data.code) {
 								window.sessionStorage.clear();
 								window.location.href = "login.html";
 							}
-								
-							
+
 						});
 
-					}).cath(()=>{});
+					}).cath(() => {});
 
 				},
 				showView(url, title) {
