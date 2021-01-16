@@ -5,14 +5,14 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>人事-组织机构</title>
-		<link rel="stylesheet" type="text/css" href="../../css/index.css"/>
+		
 	</head>
 	
 	<body>
 		<div class="pb" id="tppp">
 			<el-container>
 				<el-container>
-					<el-aside style="width:230px;">
+					<el-aside style="width:230px;background-color: white;">
 						<template>
 							<el-button @click="addPerson()" type="primary" size="mini">新增</el-button>
 							<el-button @click="updatePerson" type="warning" size="mini">修改</el-button>
@@ -43,12 +43,12 @@
 								</template>
 								<el-button @click="isShow=true" type="primary" size="mini">新增员工</el-button>
 								<el-dialog :before-close="handlerClose" @opened="handlerOpen" :visible.sync="isShow" title="新增员工" center>
-									<div id="cnt" v-loading="loading">
+									<div id="ygcnt" v-loading="loading">
 									</div>
 								</el-dialog>
 								<el-button @click="isShows=true" type="warning" size="mini">修改员工</el-button>
 								<el-dialog :before-close="handlerClose" @opened="handlerOpenn" :visible.sync="isShows" title="修改员工" center>
-									<div id="cntt" v-loading="loading">
+									<div id="ygcntt" v-loading="loading">
 									</div>
 								</el-dialog>
 								<el-button @click="deleteyid(tableData.yid)" type="danger" size="mini">删除员工</el-button>
@@ -106,11 +106,6 @@
 			</el-container>
 		</div>
 	</body>
-	<script src="../../js/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/vue.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/index.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios_cfg.js" type="text/javascript" charset="utf-8"></script>
 	<script>
 		var sss = new Vue({
 			data() {
@@ -171,10 +166,10 @@
 				},
 				handlerOpen() {
 					
-					$("#cnt").load("xzyg.html");
+					$("#ygcnt").load("view/cjl/xzyg.html");
 				},
 				handlerOpenn() {
-						$("#cntt").load("修改员工.html");
+						$("#ygcntt").load("view/cjl/修改员工.html");
 				},
 				addPerson() {
 					let _this = this;
@@ -222,7 +217,6 @@
 				},
 				updatePerson() {
 					let _this = this;
-					
 					axios.put("http://127.0.0.1:8080/dzw_sys/api/Emps/bumen", this.person).then(function(resp) {
 						if(resp.data.code == "200") {
 							_this.$message({

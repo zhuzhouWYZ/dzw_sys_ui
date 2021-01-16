@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>系统日志</title>
+	</head>
+	<body>
+		<div id="logApp">
+			<el-card>
+				<div slot="header" class="clearfix">
+					<span>日志信息</span>
+				</div>
+				 <el-table
+				    :data="logs.list"
+				    border stripe
+				    style="width: 100%;height: 525px;margin-bottom: 15px;">
+				    <el-table-column type="index" label="序号" width="200"></el-table-column>
+					<el-table-column prop="user_action" label="日志信息描述" width="360"></el-table-column>
+					<el-table-column prop="user_id" label="创建者" width="260"></el-table-column>
+					<el-table-column prop="create_time" label="创建时间" ></el-table-column>
+				  </el-table>
+				<div class="block" align="center">
+					<el-pagination :current-page="logs.pageNum" @current-change="handleCurrentChange" 
+						:page-size="10" layout="total, prev, pager, next" :total="logs.total" background>
+					</el-pagination>
+				</div>
+			</el-card>
+		</div>
+	</body>
+	
+	<script>
+		var logApp = new Vue({
+			el:'#logApp',
+			data:{
+				tableData:[{
+					create_time:'2021-01-15 09:59:13.0',
+					id:'182',
+					user_action:'回滚员工离职',
+					user_id:'admin',
+				}],
+				logs:{},
+			},
+			mounted() {
+				this.toLogs(1, 10);
+			},
+			methods: {
+				toLogs(p, s) {
+					let _this = this;
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/syslogs/${p}/${s}`).then(function(resp) {
+						_this.logs = resp.data;
+					})
+				},
+				handleCurrentChange(val) {
+					console.log(val)
+					this.toLogs(val, this.logs.pageSize);
+				},
+				
+			},
+		
+			
+		});
+		
+	</script>
+</html>

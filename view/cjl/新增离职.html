@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
-		<link rel="stylesheet" type="text/css" href="../../css/index.css" />
+		
 	</head>
 	<body>
 		<div class="container" id="xzlz">
@@ -29,16 +29,16 @@
 						</template>
 					</div>
 					<br/>
-					<el-input v-model="yuanying" placeholder="离职内容"></el-input>
+					<el-input v-model="yuanying" placeholder="离职内容" style="width: 80%;"></el-input>
+					<br/>
+					<br/>
+					<br/>
 					<el-button @click="addPerson" type="primary">提交</el-button>
 				</div>
 			</div>
 		</div>
 	</body>
-	<script src="../../js/vue.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/index.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios_cfg.js" type="text/javascript" charset="utf-8"></script>
+
 	<script>
 		var xzlz = new Vue({
 			data() {

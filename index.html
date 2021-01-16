@@ -99,22 +99,25 @@
 						<!--侧边栏菜单区-->
 						<el-menu background-color="#333744" text-color="#fff" active-text-color="#409EFF" unique-opened :collapse="isCollapse" :collapse-transition="false">
 							
-
-							<!--<el-submenu :index="i+''" v-for="(obj,i) in tree">
-								<template slot="title">
-									<span class="el-icon-s-grid"></span>
-									<span>{{obj.text}}</span>
-								</template>
-								<el-menu-item-group>
-									<span v-for="(obj1,j) in obj.children">
-											<el-menu-item  :index="i-j+''" @click="showView(obj1.id,obj1.text)"><i class="el-icon-caret-menu"></i>{{obj1.text}}</el-menu-item>
-										</span>
-								</el-menu-item-group>
-							</el-submenu>-->
-							
-<!--一级菜单-->
-							<el-submenu index="1">
+							<!--一级菜单-->
+							<el-submenu :index="i+''" v-for="(obj,i) in tree">
 								<!--一级菜单模板区-->
+								<template slot="title">
+									<i class="el-icon-s-grid"></i><span>{{obj.text}}</span>
+								</template>
+								<!--二级菜单-->
+								<el-menu-item :index="i-j+''"  @click="showView(obj1.id,obj1.text)" v-for="(obj1,j) in obj.children">
+									<!--一级菜单模板区-->
+									<template slot="title">
+										<i class="el-icon-menu"></i><span>{{obj1.text}}</span>
+									</template>
+								</el-menu-item>
+								
+							</el-submenu>
+							
+
+							<!--<el-submenu index="1">
+								
 								<template slot="title">
 									<i class="el-icon-s-grid"></i><span>数据管理</span>
 								</template>
@@ -173,6 +176,21 @@
 								<el-menu-item index="3-1" @click="showView('view/cjl/岗位定义', '岗位定义')">
 									<template slot="title">
 										<i class="el-icon-menu"></i><span>岗位定义</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="3-2" @click="showView('view/cjl/组织机构', '组织机构')">
+									<template slot="title">
+										<i class="el-icon-menu"></i><span>组织机构</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="3-3" @click="showView('view/cjl/通讯名录', '通讯名录')">
+									<template slot="title">
+										<i class="el-icon-menu"></i><span>通讯名录</span>
+									</template>
+								</el-menu-item>
+								<el-menu-item index="3-4" @click="showView('view/cjl/离职登记', '离职登记')">
+									<template slot="title">
+										<i class="el-icon-menu"></i><span>离职登记</span>
 									</template>
 								</el-menu-item>
 
@@ -262,7 +280,7 @@
 										<i class="el-icon-menu"></i><span>数据统计</span>
 									</template>
 								</el-menu-item>
-							</el-submenu>
+							</el-submenu>-->
 
 						</el-menu>
 					</el-aside>
@@ -282,6 +300,8 @@
 				</el-container>
 
 			</el-container>
+			
+			
 		</div>
 	</body>
 	<script src="js/jquery-1.12.4.js"></script>
@@ -305,9 +325,12 @@
 				tree: [],
 			},
 			mounted() {
-				this.showView('welcome', '首页');
+				this.menuMapping = menuMapping;
+				this.showView('1', '首页');
 				if(window.sessionStorage.getItem("EMP")) {
 					this.EMP = JSON.parse(window.sessionStorage.getItem("EMP"));
+					
+					console.log(this.EMP);
 				} else {
 					window.location.href = "sessionerror.html";
 				}
@@ -318,6 +341,11 @@
 
 			},
 			methods: {
+				addSysLog(loginName,action){
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/syslogs/add/${loginName}/${action}`).then(resp => {
+						console.log(resp);
+					});
+				},
 				loginOut() {
 					let _this = this;
 					this.$confirm("是否退出？", "系统提示", {
@@ -340,9 +368,12 @@
 				},
 				showView(url, title) {
 					var isCode = parseInt(url);
-					if(!isNaN(isCode)) {
+					console.log(!isNaN(isCode))
+					if(!isNaN(isCode)){
 						url = this.menuMapping[url];
 					}
+//					url = this.menuMapping[url];
+					
 
 					let _this = this;
 					let tab = {
@@ -355,6 +386,7 @@
 					if(items.length <= 0) {
 						_this.editableTabs.push(tab);
 					}
+					//console.log("地址:"+JSON.toString(_this.editableTabs))
 					_this.editableTabsValue = url;
 					$('#cnt').load(url + ".html");
 				},
@@ -379,7 +411,7 @@
 					this.editableTabsValue = activeName;
 					this.editableTabs = tabs.filter(tab => tab.name !== targetName);
 					if(this.editableTabs.length == 0) {
-						this.showView('welcome', '首页');
+						this.showView('1', '首页');
 					}
 				},
 				goTabs() {

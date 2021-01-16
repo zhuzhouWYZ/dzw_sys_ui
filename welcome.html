@@ -3,20 +3,22 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>欢迎页</title>
-		<link rel="stylesheet" href="css/index.css" />
+		
 		
 	</head>
 	
 	
 	
 	<body>
-		<div id="menuCountApp">
-			<el-card>
-		        <!-- 2.为Echarts准备一个Dom -->
-		        <div id="main" style="width: 750px;height:400px;"></div>
-		    </el-card>
-					
+		<div id="meunCountApp">
+			<h1>欢迎使用德召文汽修系统</h1>
+			<h3>站外救援台次：{{zwtc}}</h3>
+			<h3>站内维修台次：{{zntc}}</h3>
+			<h3>今日结算台次：{{jstc}}</h3>
+			<h3>今日全部收入：{{sr}}</h3>
 		</div>
+		
+		
 	</body>
 	
 	<script src="js/jquery-1.12.4.js"></script>
@@ -28,42 +30,42 @@
 	<script src="js/menu_const.js"></script>
 	<script src="js/echarts.min.js" ></script>
 	<script>
-		var menuCountApp = new Vue({
-			el:'#menuCountApp',
+		var meunCountApp = new Vue({
+			el:'#meunCountApp',
 			data:{
-				
+				zwtc:0,
+				zntc:0,
+				jstc:0,
+				sr:0,
 			},
-			mounted(){
-				 // 基于准备好的dom，初始化echarts实例
-		        var myChart = echarts.init(document.getElementById('main'));
-		
-		        // 指定图表的配置项和数据
-		        var option = {
-		            title: {
-		                text: 'ECharts 入门示例'
-		            },
-		            tooltip: {},
-		            legend: {
-		                data:['销量']
-		            },
-		            xAxis: {
-		                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-		            },
-		            yAxis: {},
-		            series: [{
-		                name: '销量',
-		                type: 'bar',
-		                data: [5, 20, 36, 10, 10, 20]
-		            }]
-		        };
-		
-		        // 使用刚指定的配置项和数据显示图表。
-		        myChart.setOption(option);
+			mounted() {
+				this.getStas();
 			},
-			methods:{
-				
-			}
-		});
+			methods: {
+				getStas(){
+					let _this = this;
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/stas`).then(function(res) {
+						console.log(res);
+						console.log(res.data);
+						res.data.forEach(function(item,i){
+								if(item.stname=='站外救援台次'){
+									_this.zwtc=item.stcount;
+								}else if(item.stname=='今日全部收入'){
+									_this.sr=item.stcount;
+								}else if(item.stname=='站内维修台次'){
+									_this.zntc=item.stcount;
+								}else if(item.stname=='今日结算台次'){
+									_this.jstc=item.stcount;
+								}
+							
+						});
+						
+					})
+				},
+			},
+			
+		})
+		
 		
 	</script>
 </html>

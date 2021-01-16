@@ -19,21 +19,19 @@
 					<span>角色管理</span>
 					<el-button @click="showAddDialog" style="float: right; padding: 10px 3px" type="primary">添加角色</el-button>
 				</div>
-				<el-table :data="jurisdictions" border stripe style="width: 100%;margin: 0 auto;">
+				<el-table :data="jurMap" border stripe style="width: 100%;margin: 0 auto;">
 					<el-table-column type="expand">
-						<el-row v-for="temp in 1">
-							<el-col :span="4">
-								<el-tag closable>数据管理</el-tag><i class="el-icon-caret-right"></i>
-							</el-col>
-							<el-col :span="20">
-								<el-tag closable>供货单位</el-tag>
-								<el-tag closable>商品资料</el-tag>
-								<el-tag closable>维修项目</el-tag>
-								<el-tag closable>车型档案</el-tag>
-								<el-tag closable>发动机品牌</el-tag>
-							</el-col>
-						</el-row>
+						<template slot-scope="scope">
+							<el-row v-for="(item1,i1) in scope.row.syfunctions" :key="i1+1">
+								<el-col :span="4">
+									<el-tag>{{item1.text}}</el-tag><i class="el-icon-caret-right"></i>
+								</el-col>
+								<el-col :span="20">
+									<el-tag closable v-for="(item2 ,i2) in item1.children" type="success" :key="item2.id" @close="delQx(scope.row.jurisdictionid,item2.id)">{{item2.text}}</el-tag>
 
+								</el-col>
+							</el-row>
+						</template>
 					</el-table-column>
 					<el-table-column type="index" label="序号" width="100">
 						<!--<template slot-scope="temp">{{temp.$index+1}}</template>-->
@@ -47,7 +45,7 @@
 						<template slot-scope="temp">
 							<el-button @click="showEditDialog(temp.row)" type="primary" size="mini" icon="el-icon-edit">编辑</el-button>
 							<el-button @click="delJur(temp.$index,temp.row.jurisdictionid)" type="danger" size="mini" icon="el-icon-delete">删除</el-button>
-							<el-button type="warning" size="mini" icon="el-icon-setting">分配权限</el-button>
+							<el-button @click="showSetQxDialog(temp.row)" type="warning" size="mini" icon="el-icon-setting">分配权限</el-button>
 						</template>
 
 					</el-table-column>
@@ -55,8 +53,19 @@
 
 			</el-card>
 
-			<el-dialog title="添加角色" :visible.sync="addDialogVisible" width="30%" 
-				center :before-close="addDialogClose" >
+			<!--对话框-->
+			<el-dialog title="分配权限" :visible.sync="SetQxDialogVisible" width="50%" @close="SetQxDialogClose()">
+				<!--权限树形控件-->
+				<el-tree :data="funMap" :props="treeProps" node-key="id" :default-checked-keys="defKeys" default-expand-all show-checkbox ref="treeRef"></el-tree>
+
+				<span slot="footer" class="dialog-footer">
+					<el-button @click="SetQxDialogVisible = false">取 消</el-button>  
+					<el-button type="primary" @click="updateQx()">确 定</el-button>
+					
+				</span>
+			</el-dialog>
+
+			<el-dialog title="添加角色" :visible.sync="addDialogVisible" width="30%" center :before-close="addDialogClose">
 				<el-form :model="addform" label-width="120px" :rules="rules" ref="addformref">
 					<el-form-item label="角色名：" prop="jurisdictionname">
 						<el-input v-model="addform.jurisdictionname" clearable></el-input>
@@ -71,12 +80,12 @@
 
 				<span slot="footer" class="dialog-footer">
 					<el-button @click="addDialogClose">取 消</el-button>  
-					<el-button type="primary" @click="addJur">确 定</el-button>
+					<el-button type="primary" @click="addJur()">确 定</el-button>
 					
 				</span>
 			</el-dialog>
-			
-			<el-dialog title="修改角色" :visible.sync="editDialogVisible" width="30%" center >
+
+			<el-dialog title="修改角色" :visible.sync="editDialogVisible" width="30%" center>
 				<el-form :model="editform" label-width="120px" :rules="rules">
 					<el-form-item label="角色名：" prop="jurisdictionname">
 						<el-input v-model="editform.jurisdictionname" clearable></el-input>
@@ -101,16 +110,18 @@
 		var jsApp = new Vue({
 			el: '#jsApp',
 			data: {
-				EMP:{},
+				EMP: {},
 				addDialogVisible: false,
 				editDialogVisible: false,
-				jurisdictions: [{
-					jurisdictionid: '1',
-					jurisdictionname: '超级管理员',
-					jurisdictioncode: 'GLY001',
-					createdate: '2020-12-29 15:47:45',
-					createby: 'admin'
-				}],
+				SetQxDialogVisible: false,
+				jurMap: [], //所有角色和自己权限
+				funMap: [], //所有权限
+				treeProps: { //树形控件
+					label: 'text',
+					children: 'children'
+				},
+				defKeys: [], //默认选中树形节点id数组值
+				jid: '', //默认选中角色id
 				rules: {
 					jurisdictionname: [{
 						required: true,
@@ -128,42 +139,43 @@
 					jurisdictioncode: '',
 					createby: '',
 				},
-				editform:{},
+				editform: {},
 
 			},
-			created(){
-//				this.EMP = sessionStorage.getItem("EMP");
-//				console.log(this.EMP)
+			created() {
+				//				this.EMP = sessionStorage.getItem("EMP");
+				//				console.log(this.EMP)
 			},
 			mounted() {
 				this.getJurisdictions();
+				this.getJurMap();
 				this.EMP = JSON.parse(window.sessionStorage.getItem("EMP"));
-				console.log(this.EMP.emplogenid)
+				console.log(syApp.EMP.emplogenid);
 			},
 
 			methods: {
-				getEMP(){
+				getJurMap() {
 					let _this = this;
-					axios.get(`http://127.0.0.1:8080/dzw_sys/api/loadEmp/getLoginEMP`).then(function(res) {
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/jurs/jurandfun`).then(function(res) {
 						console.log(res)
-						_this.EMP = res.data;
-						console.log(_this.EMP)
+						_this.jurMap = res.data;
+						console.log(res.data);
 					})
 				},
+
 				getJurisdictions() {
 					let _this = this;
 					axios.get(`http://127.0.0.1:8080/dzw_sys/api/jurs`).then(function(res) {
 						_this.jurisdictions = res.data;
 					})
 				},
-				showAddDialog(){
+				showAddDialog() {
 					this.addDialogVisible = true;
 					this.addform.createby = this.EMP.emplogenid;
 
-					
 				},
 				addDialogClose(done) {
-					this.addform ={
+					this.addform = {
 						jurisdictionname: '',
 						jurisdictioncode: '',
 						createby: this.EMP.emplogenid
@@ -172,81 +184,87 @@
 				},
 				addJur() {
 					let _this = this;
-					axios.post("http://127.0.0.1:8080/dzw_sys/api/jurs/jur/add",this.addform).then(function(res) {
+					axios.post("http://127.0.0.1:8080/dzw_sys/api/jurs/jur/add", this.addform).then(function(res) {
 						console.log(res);
 						if(res.data.code == "200") {
 							_this.$message({
 								message: res.data.msg,
 								type: 'success'
-							})
-							_this.getJurisdictions();
-							_this.addDialogVisible=false;
-							_this.addform ={
-								jurisdictionname: '',
-								jurisdictioncode: '',
-								createby: this.EMP.emplogenid
-							}
-						}else if(resp.data.code == "500"){
-							_this.$message({
-								message: res.data.msg,
-								type: 'error'
-							})
-							
-						}
-						
-					}).catch(function(e) {});
-				},
-				showEditDialog(row){
-					this.editDialogVisible = true;
-					this.editform = row;
-					this.editform.createby = this.EMP.emplogenid;
-				},
-				editDialogClose(done){
-					this.editform ={}
-					this.editDialogVisible = false;
-				},
-				editJur(){
-					let _this = this;
-					axios.post("http://127.0.0.1:8080/dzw_sys/api/jurs/jur/modify",this.editform).then(function(res) {
-						console.log(res);
-						if(res.data.code == "200") {
-							_this.$message({
-								message: res.data.msg,
-								type: 'success'
-							})
-							_this.getJurisdictions();
-							_this.editform ={}
-							_this.editDialogVisible = false;
-						}else if(resp.data.code == "500"){
+							});
+							_this.addDialogVisible = false;
+							syApp.showView('29', '角色管理');
+//														_this.getJurisdictions();
+//														_this.addDialogVisible = false;
+//														_this.addform = {
+//															jurisdictionname: '',
+//															jurisdictioncode: '',
+//															createby: this.EMP.emplogenid
+//														}
+
+						} else if(resp.data.code == "500") {
 							_this.$message({
 								message: res.data.msg,
 								type: 'error'
 							})
 
 						}
-						
+
+					}).catch(function(e) {});
+				},
+				showEditDialog(row) {
+					this.editDialogVisible = true;
+					this.editform = row;
+					this.editform.createby = this.EMP.emplogenid;
+				},
+				editDialogClose(done) {
+					this.editform = {}
+					this.editDialogVisible = false;
+				},
+				editJur() {
+					let _this = this;
+					axios.post("http://127.0.0.1:8080/dzw_sys/api/jurs/jur/modify", this.editform).then(function(res) {
+						console.log(res);
+						if(res.data.code == "200") {
+							_this.$message({
+								message: res.data.msg,
+								type: 'success'
+							})
+							_this.getJurisdictions();
+							_this.editform = {}
+							_this.editDialogVisible = false;
+							syApp.showView('29', '角色管理');
+						} else if(resp.data.code == "500") {
+							_this.$message({
+								message: res.data.msg,
+								type: 'error'
+							})
+
+						}
+
 					}).catch(function(e) {});
 				},
 				delJur(index, id) {
-					this.$confirm('确定要删除改角色吗？', '提示', {
+					let _this = this;
+					this.$confirm('确定要删除该角色吗？', '提示', {
 						confirmButtonText: '确定',
 						cancelButtonText: '取消',
 						type: 'warning',
 
 					}).then(() => {
-						this.jurisdictions.splice(index, 1);
+
 						axios.get(`http://127.0.0.1:8080/dzw_sys/api/jurs/jur/remove/${id}`).then(function(res) {
-							if(res.code == "200") {
-								this.jurisdictions.splice(index, 1);
+							console.log(res);
+							if(res.data.code == "200") {
+
 								_this.$message({
-									message: res.msg,
+									message: res.data.msg,
 									center: true,
 									type: 'success'
 								});
-
-							} else if(res.code == "500") {
+								syApp.showView('29', '角色管理');
+							} else if(res.data.code == "500") {
 								_this.$message({
-									message: res.msg,
+									message: res.data.msg,
 									center: true,
 									type: 'error'
 								});
@@ -259,6 +277,110 @@
 						});
 					});
 				},
+				delQx(jurid, syfunid) {
+					let _this = this;
+					this.$confirm('确定要删该权限吗？', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+
+					}).then(() => {
+
+						axios.get(`http://127.0.0.1:8080/dzw_sys/api/jurs/jur/delqx/${jurid}/${syfunid}`).then(function(res) {
+							console.log(res);
+							if(res.data.code == "200") {
+								_this.$message({
+									message: res.data.msg,
+									center: true,
+									type: 'success'
+								});
+								syApp.showView('29', '角色管理');
+							} else if(res.data.code == "500") {
+								_this.$message({
+									message: res.data.msg,
+									center: true,
+									type: 'error'
+								});
+							}
+						});
+					}).catch(() => {
+						this.$message({
+							type: 'info',
+							message: '已取消删除'
+						});
+					});
+				},
+				showSetQxDialog(jur) {
+					console.log("角色id:" + jur.jurisdictionid)
+					this.jid = jur.jurisdictionid;
+					//获取所有权限数据
+					let _this = this;
+					axios.get(`http://127.0.0.1:8080/dzw_sys/api/jurs/allSyfun`).then(function(res) {
+						//console.log(res)
+						_this.funMap = res.data;
+						//console.log(res.data);
+					})
+					//递归获取二级权限的id数组
+					this.getLeafKeys(jur, this.defKeys);
+					console.log("选择二级" + this.defKeys);
+					this.SetQxDialogVisible = true;
+				},
+				//通过递归获取角色下所有二级权限的id保存到defKeys中
+				getLeafKeys(node, arr) {
+					let _this = this;
+
+					node.syfunctions.forEach(function(item1, i1) {
+						if(item1.children) {
+							item1.children.forEach(function(item2, i2) {
+								//								console.log("二级节点id"+item2.id);
+								arr.push(item2.id);
+							})
+
+						}
+					})
+
+				},
+				SetQxDialogClose() {
+					this.defKeys = [];
+					this.jid = '';
+				},
+				//修改角色权限
+				updateQx() {
+					console.log("角色id" + this.jid)
+					
+					let fids = this.$refs.treeRef.getCheckedKeys()
+					console.log(fids)
+				
+					console.log(fids)
+					let _this = this;
+					$.ajax("http://127.0.0.1:8080/dzw_sys/api/qx/updateQx/" + _this.jid, {
+						type: "post",
+						data: JSON.stringify(fids),
+						dataType: 'json',
+						contentType: 'application/json',
+						success(res) {
+							console.log(res);
+							if(res.code == "200") {
+								_this.$message({
+									message: "修改权限成功！",
+									type: 'success'
+								});
+								_this.SetQxDialogVisible = false;
+								syApp.showView('29', '角色管理');
+
+							} else {
+								_this.$message({
+									message: "修改权限失败！",
+									type: 'error'
+								})
+
+							}
+						}
+					});
+
+
+				},
+
 			},
 
 		});

@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>人事-离职登记</title>
-		<link rel="stylesheet" type="text/css" href="../../css/index.css" />
+		
 	</head>
 	<body>
 		<div id="pw" class="pb">
@@ -15,7 +15,7 @@
 								<el-col>
 									<el-button @click="isShow=true" type="warning" size="mini">离职</el-button>
 									<el-dialog :before-close="handlerClose" @opened="handlerOpen" :visible.sync="isShow" title="离职登记" center>
-										<div id="cnt" v-loading="loading">
+										<div id="lzcnt" v-loading="loading">
 										</div>
 									</el-dialog>
 									<el-button @click="updatePerson" type="primary" size="mini">回滚</el-button>
@@ -56,11 +56,7 @@
 			</el-container>
 		</div>
 	</body>
-	<script src="../../js/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/vue.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/index.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../../js/axios_cfg.js" type="text/javascript" charset="utf-8"></script>
+	
 	<script>
 		var ppp = new Vue({
 			data() {
@@ -97,7 +93,7 @@
 					});
 				},
 				handlerOpen() {
-					$("#cnt").load("新增离职.html");
+					$("#lzcnt").load("view/cjl/新增离职.html");
 				},
 				goToPage(p, s) {
 					let _this = this;
